@@ -1,8 +1,8 @@
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, field
 from ..tools import Tool
-
+from ..prompt.utils import load_prompt
 
 @dataclass
 class AgentState:
@@ -22,7 +22,7 @@ class AgentState:
 class ReactAgent:
     """Implementation of a React agent that reasons and acts in cycles."""
 
-    def __init__(self, name: str, llm_client, tools: List[Tool], prompt: str):
+    def __init__(self, name: str, llm_client, tools: List[Tool], config: Dict[str, Any]):
         """Initialize the React agent.
 
         Args:
@@ -34,7 +34,9 @@ class ReactAgent:
         self.llm_client = llm_client
         self.tools = tools
         self.tool_map = {tool.name: tool for tool in tools}
-        self.prompt = prompt
+        tool_config = [{"name": tool.name, "description": tool.description} for tool in tools]
+        config['tools'] = tool_config
+        self.prompt = load_prompt(name, config)
 
     def _create_prompt(
         self, agent_input: str, intermediate_steps: List[Dict[str, str]]
@@ -62,13 +64,7 @@ class ReactAgent:
             steps_text += f"Observation: {step.get('observation', '')}\n"
 
         # Construct the full prompt
-        prompt = f"""You are an {self.name} agent that solves tasks step by step.
-
-Human Query: {agent_input}
-
-You have access to the following tools:
-{tool_descriptions}
-
+        prompt = f"""{self.prompt}
 Follow this format:
 Thought: Think about the current situation and what to do
 Action: The action to take (must be one of: {', '.join([tool.name for tool in self.tools])})
@@ -163,7 +159,7 @@ Final Answer: The final answer to the original input question
 
         return result
 
-    def _call_llm(self, prompt: str) -> str:
+    def _call_llm(self, prompt: Union[str, List[Dict[str, str]]]) -> str:
         """Call the LLM with the given prompt.
 
         This is an abstract method that should be implemented based on the specific LLM client.
@@ -174,9 +170,8 @@ Final Answer: The final answer to the original input question
         Returns:
             Raw text response from the LLM
         """
-        # Implementation depends on which LLM client you're using
-        # Example for a generic client:
-        response = self.llm_client.generate(prompt)
+        # add stop to avoid LLM generating the observation as we want to use the tool
+        response = self.llm_client.generate(prompt, system_prompt=self.system_prompt, stop=["Observation:"])
         return response
 
     def _execute_tool(self, action: str, action_input: Any) -> str:

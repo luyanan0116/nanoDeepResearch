@@ -4,18 +4,23 @@ from ..state.state import State
 from typing import List, Dict, Union
 
 
-def construct_messages(prompt: Union[str, List[Dict[str, str]]], system_prompt: str="", state: State=None) -> List[Dict[str, str]]:
+def construct_messages(
+    prompt: Union[str, List[Dict[str, str]]],
+    system_prompt: str = "",
+    state: State = None,
+) -> List[Dict[str, str]]:
     messages = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
     if isinstance(prompt, list):
         messages.extend(prompt)
-    else:
+    elif prompt:
         messages.append({"role": "user", "content": prompt})
     if state:
         for message in state.messages:
             messages.append(message)
     return messages
+
 
 class OpenAIClient:
     """Example OpenAI client for the React agent."""
@@ -33,7 +38,13 @@ class OpenAIClient:
         self.client = openai.OpenAI(api_key=openai_api_key)
         self.model = model
 
-    def generate(self, prompt: str, system_prompt: str="", state: State=None) -> str:
+    def generate(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        system_prompt: str = "",
+        state: State = None,
+        stop: List[str] = [],
+    ) -> str:
         """Generate a response from the OpenAI API.
 
         Args:
@@ -47,7 +58,7 @@ class OpenAIClient:
             model=self.model,
             messages=messages,
             # prevent the model from generating the observation as we want to use the tool
-            stop=["Observation:"],
+            stop=stop,
         )
         return response.choices[0].message.content
 
@@ -68,7 +79,13 @@ class AnthropicClient:
         self.client = anthropic.Anthropic(api_key=anthropic_api_key)
         self.model = model
 
-    def generate(self, prompt: str, system_prompt: str="", state: State=None) -> str:
+    def generate(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        system_prompt: str = "",
+        state: State = None,
+        stop: List[str] = [],
+    ) -> str:
         """Generate a response from the Anthropic API.
 
         Args:
@@ -83,6 +100,6 @@ class AnthropicClient:
             max_tokens=2000,
             messages=messages,
             # prevent the model from generating the observation as we want to use the tool
-            stop_sequences=["Observation:"],
+            stop_sequences=stop,
         )
         return response.content[0].text

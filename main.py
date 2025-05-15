@@ -38,7 +38,9 @@ def example_setup():
 #     print(f"  Observation: {step['observation']}")
 
 planner = Planner(OpenAIClient(model="gpt-4.1-mini"))
-plan = planner.plan("what is the ratio between the area of the largest and smallest states in the US?")
+plan = planner.plan(
+    "what is the ratio between the area of the largest and smallest states in the US?"
+)
 print(f"has enough context: {plan.has_enough_context}")
 print(f"thought: {plan.thought}")
 print(f"title: {plan.title}")
@@ -49,4 +51,3 @@ for i, step in enumerate(plan.steps):
     print(f"step_type: {step.step_type}")
     print(f"execution_res: {step.execution_res}")
     print(f"need_web_search: {step.need_web_search}")
-
