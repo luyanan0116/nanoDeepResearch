@@ -1,11 +1,10 @@
-import json
 import logging
 import os
 from tavily import TavilyClient
 from .tool import Tool
 
 MAX_RESULTS = 2
-TAVILY_API_KEY = "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"
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 logger = logging.getLogger(__name__)
 
