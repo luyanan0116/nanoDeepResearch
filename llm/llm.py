@@ -1,6 +1,21 @@
 # Example usage with a specific LLM client (OpenAI in this case)
 import os
+from ..state.state import State
+from typing import List, Dict, Union
 
+
+def construct_messages(prompt: Union[str, List[Dict[str, str]]], system_prompt: str="", state: State=None) -> List[Dict[str, str]]:
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    if isinstance(prompt, list):
+        messages.extend(prompt)
+    else:
+        messages.append({"role": "user", "content": prompt})
+    if state:
+        for message in state.messages:
+            messages.append(message)
+    return messages
 
 class OpenAIClient:
     """Example OpenAI client for the React agent."""
@@ -18,7 +33,7 @@ class OpenAIClient:
         self.client = openai.OpenAI(api_key=openai_api_key)
         self.model = model
 
-    def generate(self, prompt: str, system_prompt: str="") -> str:
+    def generate(self, prompt: str, system_prompt: str="", state: State=None) -> str:
         """Generate a response from the OpenAI API.
 
         Args:
@@ -27,10 +42,7 @@ class OpenAIClient:
         Returns:
             Generated text response
         """
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
+        messages = construct_messages(prompt, system_prompt, state)
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
@@ -56,7 +68,7 @@ class AnthropicClient:
         self.client = anthropic.Anthropic(api_key=anthropic_api_key)
         self.model = model
 
-    def generate(self, prompt: str, system_prompt: str="") -> str:
+    def generate(self, prompt: str, system_prompt: str="", state: State=None) -> str:
         """Generate a response from the Anthropic API.
 
         Args:
@@ -65,10 +77,7 @@ class AnthropicClient:
         Returns:
             Generated text response
         """
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
+        messages = construct_messages(prompt, system_prompt, state)
         response = self.client.messages.create(
             model=self.model,
             max_tokens=2000,
