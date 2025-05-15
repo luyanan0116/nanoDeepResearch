@@ -18,7 +18,7 @@ class OpenAIClient:
         self.client = openai.OpenAI(api_key=openai_api_key)
         self.model = model
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, system_prompt: str="") -> str:
         """Generate a response from the OpenAI API.
 
         Args:
@@ -27,9 +27,13 @@ class OpenAIClient:
         Returns:
             Generated text response
         """
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
         response = self.client.chat.completions.create(
             model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+            messages=messages,
             # prevent the model from generating the observation as we want to use the tool
             stop=["Observation:"],
         )
@@ -52,7 +56,7 @@ class AnthropicClient:
         self.client = anthropic.Anthropic(api_key=anthropic_api_key)
         self.model = model
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, system_prompt: str="") -> str:
         """Generate a response from the Anthropic API.
 
         Args:
@@ -61,10 +65,14 @@ class AnthropicClient:
         Returns:
             Generated text response
         """
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
         response = self.client.messages.create(
             model=self.model,
             max_tokens=2000,
-            messages=[{"role": "user", "content": prompt}],
+            messages=messages,
             # prevent the model from generating the observation as we want to use the tool
             stop_sequences=["Observation:"],
         )
