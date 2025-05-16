@@ -1,5 +1,5 @@
 # nanoDeepResearch
-OpenAI's [Deep Research](https://openai.com/index/introducing-deep-research/) is a really cool product. This project is inspired by ByteDance's [DeerFlow](https://github.com/bytedance/deer-flow) project, an open-source Deep Research project. DeerFlow is using Langgraph(https://github.com/LangChain-AI/langgraph) to build the agentic workflow which abstracts away a lot of details, e.g. how the ReAct agent is working.
+OpenAI's [Deep Research](https://openai.com/index/introducing-deep-research/) is a really cool product. This project is inspired by ByteDance's [DeerFlow](https://github.com/bytedance/deer-flow) project, an open-source Deep Research project. DeerFlow is using [LangGraph](https://github.com/LangChain-AI/langgraph) to build the agentic workflow which abstracts away a lot of details, e.g. how the ReAct agent is working.
 
 To make sure I understand how the DeerFlow's Deep Research agent works under the hood, I decided to build it from scratch without relying on any existing agentic framework, e.g. [LangGraph](https://www.langchain.com/langgraph).
 
