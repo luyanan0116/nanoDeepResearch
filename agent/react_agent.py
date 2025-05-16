@@ -1,3 +1,4 @@
+# ReAct paper: https://arxiv.org/abs/2210.03629
 import json
 from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, field
