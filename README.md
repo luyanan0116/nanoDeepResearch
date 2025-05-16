@@ -1,7 +1,20 @@
 # nanoDeepResearch
-This project is inspired by ByteDance's [DeerFlow](https://github.com/bytedance/deer-flow) project, an open-source Deep Research project. DeerFlow is using Langgraph(https://github.com/LangChain-AI/langgraph) to build the agentic workflow which abstracts away a lot of details, e.g. how the ReAct agent is working.
+OpenAI's [Deep Research](https://openai.com/index/introducing-deep-research/) is a really cool product. This project is inspired by ByteDance's [DeerFlow](https://github.com/bytedance/deer-flow) project, an open-source Deep Research project. DeerFlow is using Langgraph(https://github.com/LangChain-AI/langgraph) to build the agentic workflow which abstracts away a lot of details, e.g. how the ReAct agent is working.
 
-To make sure I understand how the DeerFlow's Deep Research agent works under the hood, I decided to build it from scratch without relying on any existing agentic framework.
+To make sure I understand how the DeerFlow's Deep Research agent works under the hood, I decided to build it from scratch without relying on any existing agentic framework, e.g. [LangGraph](https://www.langchain.com/langgraph).
+
+Note that this project is currently pure backend without any frontend interface.
+
+## Run the workflow
+
+Go to the parent directory of this repo and run the following command:
+
+```bash
+python3 -m nanoDeepResearch.main \
+--query "what is the area(land+water) ratio between the largest and smallest states in the US"
+```
+
+The example report can be found in `example_reports/area_ratio_largest_smallest_state_in_us.md`
 
 ## ReAct Agent
 
