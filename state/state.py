@@ -13,3 +13,6 @@ class State:
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.state.get(key, default)
+
+    def set(self, key: str, value: Any):
+        self.state[key] = value

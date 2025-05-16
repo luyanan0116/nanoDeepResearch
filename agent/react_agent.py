@@ -3,6 +3,8 @@ from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, field
 from ..tools import Tool
 from ..prompt.utils import load_prompt
+from ..state.state import State
+
 
 @dataclass
 class AgentState:
@@ -22,7 +24,9 @@ class AgentState:
 class ReactAgent:
     """Implementation of a React agent that reasons and acts in cycles."""
 
-    def __init__(self, name: str, llm_client, tools: List[Tool], config: Dict[str, Any]):
+    def __init__(
+        self, name: str, llm_client, tools: List[Tool], config: Dict[str, Any]
+    ):
         """Initialize the React agent.
 
         Args:
@@ -34,8 +38,10 @@ class ReactAgent:
         self.llm_client = llm_client
         self.tools = tools
         self.tool_map = {tool.name: tool for tool in tools}
-        tool_config = [{"name": tool.name, "description": tool.description} for tool in tools]
-        config['tools'] = tool_config
+        tool_config = [
+            {"name": tool.name, "description": tool.description} for tool in tools
+        ]
+        config["tools"] = tool_config
         self.prompt = load_prompt(name, config)
 
     def _create_prompt(
@@ -65,6 +71,7 @@ class ReactAgent:
 
         # Construct the full prompt
         prompt = f"""{self.prompt}
+Human query: {agent_input}
 Follow this format:
 Thought: Think about the current situation and what to do
 Action: The action to take (must be one of: {', '.join([tool.name for tool in self.tools])})
@@ -171,7 +178,9 @@ Final Answer: The final answer to the original input question
             Raw text response from the LLM
         """
         # add stop to avoid LLM generating the observation as we want to use the tool
-        response = self.llm_client.generate(prompt, system_prompt=self.system_prompt, stop=["Observation:"])
+        response = self.llm_client.generate(
+            prompt, system_prompt=self.prompt, stop=["Observation:"]
+        )
         return response
 
     def _execute_tool(self, action: str, action_input: Any) -> str:
@@ -193,7 +202,9 @@ Final Answer: The final answer to the original input question
         except Exception as e:
             return f"Error executing tool '{action}': {str(e)}"
 
-    def run(self, agent_input: str, max_iterations: int = 10) -> Dict[str, Any]:
+    def run(
+        self, agent_input: str, workflow_state: State, max_iterations: int = 10
+    ) -> Dict[str, Any]:
         """Run the React agent on a user query.
 
         Args:
@@ -205,9 +216,10 @@ Final Answer: The final answer to the original input question
         """
         agent_state = AgentState()
         agent_state.messages.append({"role": "user", "content": agent_input})
+        observations = workflow_state.get("observations", [])
 
         # Main React loop
-        for _ in range(max_iterations):
+        for i in range(max_iterations):
             # Create prompt with current state
             prompt = self._create_prompt(agent_input, agent_state.intermediate_steps)
 
@@ -232,7 +244,13 @@ Final Answer: The final answer to the original input question
 
             # Execute tool
             observation = self._execute_tool(action, action_input)
-
+            print(f"thought: {thought}")
+            print(f"action: {action}")
+            print(f"action_input: {action_input}")
+            print(f"observation: {observation}")
+            print(f"react agent iter: {i}, max_iterations: {max_iterations}")
+            print("--------------------------------")
+            observations.append(observation)
             # Record step
             step = {
                 "thought": thought,
@@ -257,5 +275,8 @@ Final Answer: The final answer to the original input question
             "intermediate_steps": agent_state.intermediate_steps,
             "is_complete": agent_state.is_done,
         }
-
+        workflow_state.set("observations", observations)
+        messages = workflow_state.get("messages", [])
+        messages.append(agent_state.messages[-1])
+        workflow_state.set("messages", messages)
         return result

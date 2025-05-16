@@ -32,9 +32,7 @@ class TavilySearchTool(Tool):
         return clean_results
 
     def __call__(self, query: str) -> str:
-        print(f"Searching for:\n {query}")
         response = self.client.search(query=query, max_results=MAX_RESULTS)
-        print(f"Search Response:\n {response}")
         clean_results = self.clean_results(response)
         return ";".join(str(result) for result in clean_results)
 
