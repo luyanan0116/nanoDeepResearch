@@ -5,6 +5,16 @@ To make sure I understand how the DeerFlow's Deep Research agent works under the
 
 Note that this project is currently pure backend without any frontend interface.
 
+## Prepare the API keys
+
+We need to prepare the API keys for the following services and store them as environment variables:
+- OpenAI: `OPENAI_API_KEY`
+- Claude: `ANTHROPIC_API_KEY`
+- Tavily: `TAVILY_API_KEY`
+- Jina: `JINA_API_KEY`
+
+
+
 ## Run the workflow
 
 Go to the parent directory of this repo and run the following command:
