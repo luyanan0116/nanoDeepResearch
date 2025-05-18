@@ -5,6 +5,17 @@ To make sure I understand how the DeerFlow's Deep Research agent works under the
 
 Note that this project is currently pure backend without any frontend interface.
 
+## Recommended way of using this repo
+
+This project is NOT for production use, since it lacks many production features, e.g. web UI, token streaming, async execution, etc.
+
+But since it is build from scratch, it is easy to see the output of each step in the workflow, e.g.
+
+* for web search, what LLM suggests to search
+* for coding, what code the LLM generates
+* for planning, what research plan the LLM outputs
+* whatever step you are curious about
+
 ## Prepare the API keys
 
 We need to prepare the API keys for the following services and store them as environment variables:
