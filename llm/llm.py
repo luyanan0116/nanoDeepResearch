@@ -42,7 +42,8 @@ class OpenAIClient:
         import openai
 
         openai_api_key = os.getenv("OPENAI_API_KEY")
-        self.client = openai.OpenAI(api_key=openai_api_key)
+        self.client = openai.OpenAI(api_key=openai_api_key,
+                                    base_url="https://yibuapi.com/v1")
         self.model = model
 
     def generate(
@@ -83,7 +84,8 @@ class AnthropicClient:
         import anthropic
 
         anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
-        self.client = anthropic.Anthropic(api_key=anthropic_api_key)
+        self.client = anthropic.Anthropic(api_key=anthropic_api_key,
+                                          base_url="https://yibuapi.com/v1")
         self.model = model
 
     def generate(
